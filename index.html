@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fruit Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        .fruit-list {
+            margin-top: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <div>
+        <p>Score: <span id="score">0</span></p>
+        <p>Lives: <span id="lives">3</span></p>
+        <p>Time: <span id="timer">60</span>s</p>
+    </div>
+    <div class="fruit-list">
+        <p>['🍎', '🍊', '🍉', '🍐', '🍓', '🍑', '🍍']</p>
+    </div>
+
+    <script>
+        const fruits = ['🍎', '🍊', '🍉', '🍐', '🍓', '🍑', '🍍'];
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const livesElement = document.getElementById('lives');
+        const timerElement = document.getElementById('timer');
+
+        let score = 0;
+        let lives = 3;
+        let timeLeft = 60;
+        let currentFruits = [];
+
+        const gravity = 0.2;
+
+        // Fonction pour créer un fruit
+        function createFruit() {
+            const radius = Math.random() * 20 + 30;
+            const x = Math.random() * canvas.width;
+            const y = canvas.height + radius;
+            const vx = (Math.random() - 0.5) * 8;
+            const vy = -Math.random() * 12 - 10;
+            const emoji = fruits[Math.floor(Math.random() * fruits.length)];
+
+            currentFruits.push({ x, y, vx, vy, radius, emoji });
+        }
+
+        // Fonction pour dessiner un fruit
+        function drawFruit(fruit) {
+            ctx.font = `${fruit.radius * 2}px Arial`; // Adjust font size to match the fruit size
+            ctx.fillText(fruit.emoji, fruit.x, fruit.y);
+        }
+
+        // Fonction pour mettre à jour les fruits
+        function updateFruits() {
+            for (let i = currentFruits.length - 1; i >= 0; i--) {
+                const fruit = currentFruits[i];
+                fruit.vy += gravity;
+                fruit.x += fruit.vx;
+                fruit.y += fruit.vy;
+
+                if (fruit.y - fruit.radius > canvas.height) {
+                    currentFruits.splice(i, 1);
+                }
+            }
+        }
+
+        function updateScore() {
+            scoreElement.textContent = score;
+        }
+
+        function updateLives() {
+            livesElement.textContent = lives;
+        }
+
+        function updateTimer() {
+            timerElement.textContent = timeLeft;
+        }
+
+        function checkAnswer(index) {
+            const fruitToCheck = fruits[index];
+            const fruitIndex = currentFruits.findIndex(fruit => fruit.emoji === fruitToCheck);
+
+            if (fruitIndex !== -1) {
+                score++;
+                updateScore();
+                currentFruits.splice(fruitIndex, 1); // Remove the first found fruit
+            } else {
+                lives--;
+                updateLives();
+            }
+
+            if (lives <= 0 || timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            alert(`Game Over! Your score is ${score}`);
+            clearInterval(timerInterval);
+            cancelAnimationFrame(animationFrameId);
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (Math.random() < 0.05) {
+                createFruit();
+            }
+
+            currentFruits.forEach(drawFruit);
+            updateFruits();
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        let animationFrameId = requestAnimationFrame(animate);
+
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimer();
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }, 1000);
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            console.log(key);
+            if (key >= '0' && key <= '7') { // Check if the key pressed is between 1 and 7
+                const index = parseInt(key); // Convert the key to an index (0 to 6)
+                checkAnswer(index);
+            }
+        });
+    </script>
+</body>
+</html>
