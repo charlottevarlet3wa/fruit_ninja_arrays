@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Fruit Game</title>
     <style>
+        
         canvas {
             border: 1px solid black;
         }
@@ -12,11 +13,20 @@
             font-family: Arial, sans-serif;
             font-size: 16px;
         }
+        #message {
+            color: purple;
+        }
+
+        #data {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="600" height="600"></canvas>
-    <div>
+    <div id="data">
+        <p id="message"></p>
         <p>Score: <span id="score">0</span></p>
         <p>Lives: <span id="lives">3</span></p>
         <p>Time: <span id="timer">60</span>s</p>
